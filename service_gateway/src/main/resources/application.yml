@@ -1,0 +1,24 @@
+server:
+    port: 8222
+
+spring:
+  application:
+    name: service-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: service-user
+          uri: lb://service-user
+          predicates:
+            - Path=/user/** # 路径匹配
+        - id: service-admin
+          uri: lb://service-media
+          predicates:
+            - Path=/media/** # 路径匹配
+
+    nacos:
+      discovery:
+        server-addr: 192.168.94.130:8848

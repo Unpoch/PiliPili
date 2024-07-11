@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wz.pilipili.video.mapper.VideoViewMapper">
+
+    <select id="getVideoView" parameterType="java.util.Map" resultType="com.wz.pilipili.entity.video.VideoView">
+        select
+            *
+        from
+            t_video_view
+        where
+            video_id = #{videoId}
+            <if test = "userId != null and clientId != null">
+                and client_id = #{clientId} ans user_id is null
+            </if>
+            <if test = "userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test = "ip != null">
+                and ip = #{ip}
+            </if>
+            <if test = "today != null">
+                and DATE_FORMAT(createTime,'%Y-%m-%d') = #{today}
+            </if>
+    </select>
+
+    <select id="getVideoViewCountByVideoIds" resultType="com.wz.pilipili.vo.video.VideoViewCount">
+        select
+            video_id,
+            count(id) count
+        from
+            t_video_view
+        where
+            video_id in
+            <foreach collection="videoIds" item="videoId" open="(" close=")" separator=",">
+                #{videoId}
+            </foreach>
+        group by
+            video_id
+    </select>
+
+</mapper>

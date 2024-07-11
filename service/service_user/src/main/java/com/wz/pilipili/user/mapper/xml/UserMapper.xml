@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wz.pilipili.user.mapper.UserMapper">
+
+    <!--根据phone和email查询用户-->
+    <select id="getUserByPhoneOrEmail" parameterType="java.lang.String" resultType="com.wz.pilipili.entity.user.User">
+        select
+            *
+        from
+            t_user
+        where
+            phone = #{phone} or email = #{email}
+    </select>
+</mapper>

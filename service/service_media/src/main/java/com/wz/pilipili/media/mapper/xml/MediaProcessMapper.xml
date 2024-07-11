@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wz.pilipili.media.mapper.MediaProcessMapper">
+
+    <select id="selectListByShardIndex" resultType="com.wz.pilipili.entity.media.MediaProcess">
+        <![CDATA[
+        SELECT *
+        FROM t_media_process t
+        WHERE t.id % #{shardTotal} = #{shardIndex}
+          AND (t.status = '1' OR t.status = '3')
+          AND t.fail_count < #{failCount}
+        LIMIT #{count}
+        ]]>
+    </select>
+
+    <update id="startTask">
+        <![CDATA[
+        update t_media_process m
+        set m.status='4'
+        where (m.status = '1' or m.status = '3')
+          and m.fail_count < #{failCount}
+          and m.id = #{id}
+        ]]>
+    </update>
+
+
+</mapper>
