@@ -152,7 +152,6 @@ public class UserController {
     }
 
 
-
     /*
     远程调用接口
     根据userId集合，批量查询用户信息
@@ -169,6 +168,16 @@ public class UserController {
     @GetMapping("/inner/getInfoById")
     public UserInfo getInfoById(Long userId) {
         return userService.getUserInfoByUserId(userId);
+    }
+
+    /*
+    远程调用接口
+    增加用户经验
+     */
+    @PostMapping("/inner/increaseExperience")
+    public void increaseExperience(@RequestParam Long userId,
+                                   @RequestParam Integer experience) {
+        userService.increaseExperience(userId, experience);
     }
 
 }

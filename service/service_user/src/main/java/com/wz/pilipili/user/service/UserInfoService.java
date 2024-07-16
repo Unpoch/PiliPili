@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.wz.pilipili.entity.user.UserInfo;
 
+import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -21,4 +23,8 @@ public interface UserInfoService extends IService<UserInfo> {
     List<UserInfo> getUserInfoListByUserIds(Set<Long> userIds);
 
     IPage<UserInfo> pageListUserInfos(JSONObject params);
+
+    void updateUserInfo(UserInfo userInfo);
+
+    void updateUserLastLoginDate(Map<Long, String> userLastLoginDateMap) throws ParseException;
 }

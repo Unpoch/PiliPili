@@ -31,6 +31,12 @@ public class UserInfo {
 
     private String birth;
 
+    private Integer experience;
+
+    private Integer dailyExperience;
+
+    private Date lastLoginDate;
+
     @Field(type = FieldType.Date)
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;

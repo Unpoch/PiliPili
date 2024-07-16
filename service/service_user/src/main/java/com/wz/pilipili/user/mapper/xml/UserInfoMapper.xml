@@ -2,4 +2,55 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wz.pilipili.user.mapper.UserInfoMapper">
 
+    <update id="batchUpdateUserInfos" parameterType="com.wz.pilipili.entity.user.UserInfo">
+        <foreach collection="userInfoList" item="item" separator=";">
+            UPDATE
+                t_user_info
+            <set>
+                <if test="item.nick != null">
+                    nick = #{item.nick},
+                </if>
+                <if test="item.avatar != null">
+                    avatar = #{item.avatar},
+                </if>
+                <if test="item.sign != null">
+                    sign = #{item.sign},
+                </if>
+                <if test="item.gender != null">
+                    gender = #{item.gender},
+                </if>
+                <if test="item.birth != null">
+                    birth = #{item.birth},
+                </if>
+                <if test="item.experience != null">
+                    experience = #{item.experience},
+                </if>
+                <if test="item.dailyExperience != null">
+                    daily_experience = #{item.dailyExperience},
+                </if>
+                <if test="item.lastLoginDate != null">
+                    last_login_date = #{item.lastLoginDate}
+                </if>
+            </set>
+            WHERE
+                id = #{item.id}
+        </foreach>
+    </update>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </mapper>

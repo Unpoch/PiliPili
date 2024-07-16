@@ -8,9 +8,14 @@ import com.wz.pilipili.entity.user.UserInfo;
 import com.wz.pilipili.user.mapper.UserInfoMapper;
 import com.wz.pilipili.user.service.UserInfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wz.pilipili.util.DateUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,6 +23,9 @@ import java.util.Set;
  */
 @Service
 public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> implements UserInfoService {
+
+    @Autowired
+    private UserInfoMapper userInfoMapper;
 
     /**
      * 根据userId获取用户信息UserInfo
@@ -50,5 +58,30 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         LambdaQueryWrapper<UserInfo> wrapper = new LambdaQueryWrapper<UserInfo>()
                 .like(UserInfo::getNick, nick).orderByDesc(UserInfo::getId);
         return baseMapper.selectPage(pageParam, wrapper);
+    }
+
+    /**
+     * 更新用户信息
+     */
+    @Override
+    public void updateUserInfo(UserInfo userInfo) {
+        baseMapper.updateById(userInfo);
+    }
+
+    /**
+     * 更新用户的最后登录时间
+     */
+    @Transactional
+    @Override
+    public void updateUserLastLoginDate(Map<Long, String> userLastLoginDateMap) throws ParseException {
+        //1.根据userId查询用户信息
+        Set<Long> userIds = userLastLoginDateMap.keySet();
+        List<UserInfo> userInfoList = this.getUserInfoListByUserIds(userIds);
+        //2.批量更新用户信息
+        for (UserInfo userInfo : userInfoList) {
+            String lastLoginDateStr = userLastLoginDateMap.get(userInfo.getUserId());
+            userInfo.setLastLoginDate(DateUtil.convertStringToDate(lastLoginDateStr));
+        }
+        userInfoMapper.batchUpdateUserInfos(userInfoList);
     }
 }

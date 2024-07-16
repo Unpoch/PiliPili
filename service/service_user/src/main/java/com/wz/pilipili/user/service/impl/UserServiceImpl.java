@@ -48,6 +48,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 注册
+     * TODO: 初始化用户角色，经验
      */
     @Override
     @Transactional
@@ -93,6 +94,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 登录
+     * TODO: 调用登录接口时也要判断是否首次登录
      */
     @Override
     public String login(User user) throws Exception {
@@ -214,6 +216,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public UserInfo getUserInfoByUserId(Long userId) {
         return userInfoService.getUserInfoByUserId(userId);
+    }
+
+    /**
+     * 增加用户经验
+     * TODO : 这里还有一个升级（Lv(x) -> Lv(x+1)）的逻辑
+     */
+    @Transactional
+    @Override
+    public void increaseExperience(Long userId, Integer experience) {
+        //1.先查询用户当天已经获取的经验值
+        UserInfo userInfo = userInfoService.getUserInfoByUserId(userId);
+        Integer daily = userInfo.getDailyExperience();
+        Integer total = userInfo.getExperience();//总经验值
+        if (daily.equals(UserConstant.DAILY_MAX_EXPERIENCE)) {//已经到达每日经验上限
+            return;
+        }
+        //2.增加每日经验和总经验。要看增加的经验experience + daily > Max,则直接将经验置为max
+        if (daily + experience > UserConstant.DAILY_MAX_EXPERIENCE) {
+            userInfo.setDailyExperience(UserConstant.DAILY_MAX_EXPERIENCE);
+            userInfo.setExperience(total + UserConstant.DAILY_MAX_EXPERIENCE - daily);//增加的总经验就是差值（max - daily）
+            return;
+        }
+        //3.如果experience + daily <= Max
+        userInfo.setDailyExperience(daily + experience);
+        userInfo.setExperience(total + experience);
+        //4.更新UserInfo
+        userInfoService.updateUserInfo(userInfo);
     }
 
 

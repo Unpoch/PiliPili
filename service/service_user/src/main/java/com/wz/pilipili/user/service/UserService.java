@@ -34,4 +34,6 @@ public interface UserService extends IService<User> {
     List<UserInfo> batchGetUserInfoListByUserIds(Set<Long> userIds);
 
     UserInfo getUserInfoByUserId(Long userId);
+
+    void increaseExperience(Long userId, Integer experience);
 }
