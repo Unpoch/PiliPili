@@ -34,6 +34,18 @@ public class UserCoinServiceImpl extends ServiceImpl<UserCoinMapper, UserCoin> i
      */
     @Override
     public void updateUserCoin(Long userId, Integer amount) {
+        UserCoin userCoin = new UserCoin();
+        userCoin.setUserId(userId);
+        userCoin.setAmount(amount);
+        baseMapper.update(userCoin, new LambdaQueryWrapper<UserCoin>()
+                .eq(UserCoin::getUserId, userId));
+    }
+
+    /**
+     * 增加用户硬币数量
+     */
+    @Override
+    public void increaseCoins(Long userId, Integer amount) {
         UserCoin userCoin = baseMapper.selectOne(new LambdaQueryWrapper<UserCoin>()
                 .eq(UserCoin::getUserId, userId));
         userCoin.setAmount(userCoin.getAmount() + amount);

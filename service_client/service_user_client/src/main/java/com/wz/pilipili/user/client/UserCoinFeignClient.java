@@ -17,4 +17,11 @@ public interface UserCoinFeignClient {
      */
     @PostMapping("/inner/updateUserCoin")
     public void updateUserCoin(Long userId, Integer amount);
+
+    /*
+    远程调用接口：增加用户硬币数量
+     */
+    @PostMapping("/inner/increaseCoins")
+    public void increaseCoins(@RequestParam Long userId,@RequestParam Integer amount);
+
 }

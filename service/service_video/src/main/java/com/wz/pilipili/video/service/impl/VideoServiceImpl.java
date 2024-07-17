@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysql.cj.util.StringUtils;
+import com.wz.pilipili.constant.UserConstant;
 import com.wz.pilipili.entity.page.PageResult;
 import com.wz.pilipili.entity.user.UserInfo;
 import com.wz.pilipili.entity.video.*;
@@ -258,8 +259,15 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
             videoCoin.setAmount(newCoinAmount);
             videoCoinService.updateVideoCoin(videoCoin);
         }
-        //4.用户投完币后，还需要更新用户的硬币总数（远程调用）
+        //4.用户投完币后，需要更新用户的硬币总数（远程调用）
+        //  还需要更新视频发布者的硬币个数
+        Long upUserId = video.getUserId();//发布者的userId
+        Integer upCoinAmount = userCoinFeignClient.getUserCoins(upUserId);
         userCoinFeignClient.updateUserCoin(userId, (userCoinAmount - postCoins));
+        userCoinFeignClient.updateUserCoin(upUserId, (upCoinAmount + postCoins));
+        //5. 增加投币用户的经验值(10经验/个)，增加被投币用户的经验值(1经验值/1个)
+        userInfoFeignClient.increaseExperience(userId, UserConstant.TEN_EXPERIENCE * postCoins);
+        userInfoFeignClient.increaseExperience(upUserId,UserConstant.ONE_EXPERIENCE * postCoins);
     }
 
     /**

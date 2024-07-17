@@ -62,8 +62,9 @@ public class FirstLoginFilter implements Ordered, GlobalFilter {
         userInfoFeignClient.increaseExperience(userId, experience);
     }
 
+    //TODO：只有 等级 >= Lv1才能调用
     @Async
     public void increaseCoins(Long userId, Integer coins) {
-        userCoinFeignClient.updateUserCoin(userId, coins);
+        userCoinFeignClient.increaseCoins(userId, coins);
     }
 }

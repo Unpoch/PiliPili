@@ -25,7 +25,8 @@ public class UserCoinController {
      * TODO : 用户硬币获取行为
      */
 
-    /**、
+    /**
+     * 、
      * TODO ：查询用户硬币数量
      */
 
@@ -44,6 +45,14 @@ public class UserCoinController {
     @PostMapping("/inner/updateUserCoin")
     public void updateUserCoin(Long userId, Integer amount) {
         userCoinService.updateUserCoin(userId, amount);
+    }
+
+    /*
+    远程调用接口：增加用户硬币数量
+     */
+    @PostMapping("/inner/increaseCoins")
+    public void increaseCoins(@RequestParam Long userId,@RequestParam Integer amount) {
+        userCoinService.increaseCoins(userId, amount);
     }
 }
 

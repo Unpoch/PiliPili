@@ -16,4 +16,6 @@ public interface UserCoinService extends IService<UserCoin> {
     Integer getUserCoins(Long userId);
 
     void updateUserCoin(Long userId, Integer amount);
+
+    void increaseCoins(Long userId, Integer amount);
 }

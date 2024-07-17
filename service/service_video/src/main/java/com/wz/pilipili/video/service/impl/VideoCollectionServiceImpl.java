@@ -3,11 +3,13 @@ package com.wz.pilipili.video.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wz.pilipili.constant.UserConstant;
 import com.wz.pilipili.entity.page.PageResult;
 import com.wz.pilipili.entity.video.Video;
 import com.wz.pilipili.entity.video.VideoCollection;
 import com.wz.pilipili.entity.video.VideoCollectionGroup;
 import com.wz.pilipili.exception.ConditionException;
+import com.wz.pilipili.user.client.UserCoinFeignClient;
 import com.wz.pilipili.video.mapper.VideoCollectionMapper;
 import com.wz.pilipili.video.service.VideoCollectionGroupService;
 import com.wz.pilipili.video.service.VideoCollectionService;
@@ -40,6 +42,9 @@ public class VideoCollectionServiceImpl extends ServiceImpl<VideoCollectionMappe
     @Autowired
     private VideoCollectionGroupService videoCollectionGroupService;
 
+    @Autowired
+    private UserCoinFeignClient userCoinFeignClient;
+
     /**
      * 收藏视频
      */
@@ -63,6 +68,12 @@ public class VideoCollectionServiceImpl extends ServiceImpl<VideoCollectionMappe
                 .eq(VideoCollection::getVideoId, videoId));
         videoCollection.setUserId(userId);
         baseMapper.insert(videoCollection);
+        //4.判断此时该视频的收藏数 % 200 == 0，则说明视频的收藏数增加了200，增加投稿人的硬币数
+        int collectCount = baseMapper.selectCount(new LambdaQueryWrapper<VideoCollection>()
+                .eq(VideoCollection::getVideoId, videoId));
+        if (collectCount % 200 == 0) {//增加投稿用户1硬币
+            userCoinFeignClient.increaseCoins(userId, UserConstant.ONE_COIN);
+        }
     }
 
     /**
