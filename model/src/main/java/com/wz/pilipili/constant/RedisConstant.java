@@ -31,4 +31,9 @@ public interface RedisConstant {
      * 用户登录时间key
      */
     public static final String LOGIN_TIME = "user-login-time:";
+
+    /**
+     * 用户每日首次观看视频key，值为"1"，有值则说明当日已看过
+     */
+    public static final String DAILY_WATCHED_VIDEO = "user-watched-video:";
 }

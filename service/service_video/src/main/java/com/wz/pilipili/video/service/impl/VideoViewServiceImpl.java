@@ -3,8 +3,12 @@ package com.wz.pilipili.video.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mysql.cj.util.StringUtils;
+import com.wz.pilipili.constant.RedisConstant;
+import com.wz.pilipili.constant.UserConstant;
 import com.wz.pilipili.entity.page.PageResult;
 import com.wz.pilipili.entity.video.VideoView;
+import com.wz.pilipili.user.client.UserInfoFeignClient;
 import com.wz.pilipili.util.IpUtil;
 import com.wz.pilipili.video.mapper.VideoViewMapper;
 import com.wz.pilipili.video.service.VideoViewService;
@@ -12,11 +16,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wz.pilipili.vo.video.VideoViewCount;
 import eu.bitwalker.useragentutils.UserAgent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -31,6 +37,12 @@ public class VideoViewServiceImpl extends ServiceImpl<VideoViewMapper, VideoView
 
     @Autowired
     private VideoViewMapper videoViewMapper;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    private UserInfoFeignClient userInfoFeignClient;
 
     /**
      * 添加视频播放记录
@@ -64,6 +76,27 @@ public class VideoViewServiceImpl extends ServiceImpl<VideoViewMapper, VideoView
             videoView.setClientId(clientId);
             baseMapper.insert(videoView);
         }
+        //5.判断是否是当天第一次观看视频，是则增加经验
+        if (userId != null) {
+            if (isFirstWatchOfDay(userId)) return;
+            //第一次观看，增加经验
+            userInfoFeignClient.increaseExperience(userId, UserConstant.FIVE_EXPERIENCE);
+        }
+    }
+
+
+    /*
+    是否是当天第一次观看视频
+     */
+    private boolean isFirstWatchOfDay(Long userId) {
+        String key = RedisConstant.DAILY_WATCHED_VIDEO + userId;
+        Boolean isWatchedToday = redisTemplate.hasKey(key);//是否存在key
+        if (Boolean.TRUE.equals(isWatchedToday)) {//用户当天已经观看过视频
+            return true;
+        }
+        //用户当天第一次观看视频
+        redisTemplate.opsForValue().set(key, "1", 1, TimeUnit.DAYS);
+        return false;
     }
 
     /**
