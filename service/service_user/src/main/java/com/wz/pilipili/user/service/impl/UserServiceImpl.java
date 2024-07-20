@@ -252,12 +252,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             dailyExperience = curDaily + experience;
             totalExperience = curExperience + experience;
         }
-        //4.看totalExperience是否超过了当前等级的经验值
-        //当前角色等级对应的经验值
-        Integer roleCodeExperience = RoleLevel.getExperienceByRoleCode(roleCode);
-        if (totalExperience >= roleCodeExperience) {//升级
-            String nextRoleCode = RoleLevel.getNextRoleCode(roleCode);
-            if (!StringUtils.isNullOrEmpty(nextRoleCode)) {//插入用户角色表，用户拥有了新角色
+        //4.看totalExperience是否到达了下一等级的经验值
+        String nextRoleCode = RoleLevel.getNextRoleCode(roleCode);
+        Integer nextRoleLevelExperience = RoleLevel.getExperienceByRoleCode(nextRoleCode);//下一等级角色对应的经验值
+        if (!StringUtils.isNullOrEmpty(nextRoleCode)){
+            if (totalExperience >= nextRoleLevelExperience) {//升级
+                //插入用户角色表，用户拥有了新角色
                 AuthRole role = authRoleService.getRoleByCode(nextRoleCode);
                 UserRole userRole = new UserRole();
                 userRole.setUserId(userId);
