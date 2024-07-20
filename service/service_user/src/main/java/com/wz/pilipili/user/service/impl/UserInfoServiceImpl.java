@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,6 +84,20 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         for (UserInfo userInfo : userInfoList) {
             String lastLoginDateStr = userLastLoginDateMap.get(userInfo.getUserId());
             userInfo.setLastLoginDate(DateUtil.convertStringToDate(lastLoginDateStr));
+        }
+        userInfoMapper.batchUpdateUserInfos(userInfoList);
+    }
+
+    /**
+     * 批量删除当日活跃用户的每日经验
+     */
+    @Override
+    public void batchRemoveDailyExperience() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        Date yesterdayDate = Date.from(yesterday.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        List<UserInfo> userInfoList = userInfoMapper.selectYesterdayActivityUsers(yesterdayDate);
+        for (UserInfo userInfo : userInfoList) {
+            userInfo.setDailyExperience(0);
         }
         userInfoMapper.batchUpdateUserInfos(userInfoList);
     }

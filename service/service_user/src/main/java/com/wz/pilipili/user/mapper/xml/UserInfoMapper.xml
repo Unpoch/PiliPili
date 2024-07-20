@@ -38,7 +38,14 @@
     </update>
 
 
-
+    <select id="selectYesterdayActivityUsers" resultType="com.wz.pilipili.entity.user.UserInfo">
+        SELECT
+            *
+        FROM
+            t_user_info
+        WHERE
+            DATE(last_login_date) = #{date}
+    </select>
 
 
 

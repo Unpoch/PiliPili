@@ -2,6 +2,7 @@ package com.wz.pilipili.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.wz.pilipili.entity.auth.UserRole;
+import com.wz.pilipili.exception.ConditionException;
 import com.wz.pilipili.user.mapper.UserRoleMapper;
 import com.wz.pilipili.user.service.AuthRoleService;
 import com.wz.pilipili.user.service.UserRoleService;
@@ -9,7 +10,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>
@@ -43,5 +46,17 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
     @Override
     public void addUserRole(UserRole userRole) {
         this.save(userRole);
+    }
+
+    /**
+     * 根据userId获取用户当前最高等级
+     */
+    @Override
+    public String getMaxRoleCodeByUserId(Long userId) {
+        List<UserRole> roleList = this.getUserRoleListByUserId(userId);
+        return roleList.stream().
+                map(UserRole::getRoleCode).
+                max(Comparator.reverseOrder())
+                .orElseThrow(() -> new ConditionException("用户不存在！"));//从小到大排列的最大值
     }
 }

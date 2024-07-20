@@ -18,4 +18,6 @@ public interface UserRoleService extends IService<UserRole> {
     List<UserRole> getUserRoleListByUserId(Long userId);
 
     void addUserRole(UserRole userRole);
+
+    String getMaxRoleCodeByUserId(Long userId);
 }

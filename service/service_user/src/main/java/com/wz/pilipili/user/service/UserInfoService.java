@@ -27,4 +27,6 @@ public interface UserInfoService extends IService<UserInfo> {
     void updateUserInfo(UserInfo userInfo);
 
     void updateUserLastLoginDate(Map<Long, String> userLastLoginDateMap) throws ParseException;
+
+    void batchRemoveDailyExperience();
 }

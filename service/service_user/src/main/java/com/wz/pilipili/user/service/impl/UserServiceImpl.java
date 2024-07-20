@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysql.cj.util.StringUtils;
+import com.wz.pilipili.enums.RoleLevel;
 import com.wz.pilipili.constant.UserConstant;
+import com.wz.pilipili.entity.auth.AuthRole;
 import com.wz.pilipili.entity.auth.UserRole;
 import com.wz.pilipili.entity.page.PageResult;
 import com.wz.pilipili.entity.user.RefreshTokenDetail;
@@ -39,6 +41,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private UserAuthService userAuthService;
+
+    @Autowired
+    private AuthRoleService authRoleService;
 
     @Autowired
     private RefreshTokenService refreshTokenService;
@@ -219,29 +224,50 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
-     * 增加用户经验
-     * TODO : 这里还有一个升级（Lv(x) -> Lv(x+1)）的逻辑
+     * 增加用户经验，若达到升级条件则升级
      */
     @Transactional
     @Override
     public void increaseExperience(Long userId, Integer experience) {
+        //查询用户的角色信息，如果已经是Lv6了，经验就不能再增长了
+        String roleCode = userRoleService.getMaxRoleCodeByUserId(userId);
+        if (roleCode.equals(RoleLevel.LV6.getRoleCode())) {
+            return;
+        }
         //1.先查询用户当天已经获取的经验值
         UserInfo userInfo = userInfoService.getUserInfoByUserId(userId);
-        Integer daily = userInfo.getDailyExperience();
-        Integer total = userInfo.getExperience();//总经验值
-        if (daily.equals(UserConstant.DAILY_MAX_EXPERIENCE)) {//已经到达每日经验上限
+        Integer curDaily = userInfo.getDailyExperience();
+        Integer curExperience = userInfo.getExperience();//总经验值（当前经验值）
+        if (curDaily.equals(UserConstant.DAILY_MAX_EXPERIENCE)) {//已经到达每日经验上限
             return;
         }
         //2.增加每日经验和总经验。要看增加的经验experience + daily > Max,则直接将经验置为max
-        if (daily + experience > UserConstant.DAILY_MAX_EXPERIENCE) {
-            userInfo.setDailyExperience(UserConstant.DAILY_MAX_EXPERIENCE);
-            userInfo.setExperience(total + UserConstant.DAILY_MAX_EXPERIENCE - daily);//增加的总经验就是差值（max - daily）
-            return;
+        int dailyExperience;
+        int totalExperience;
+        if (curDaily + experience > UserConstant.DAILY_MAX_EXPERIENCE) {
+            //增加的总经验就是差值（max - daily）
+            dailyExperience = UserConstant.DAILY_MAX_EXPERIENCE;
+            totalExperience = curExperience + UserConstant.DAILY_MAX_EXPERIENCE - curDaily;
+        } else {//3.如果experience + daily <= Max
+            dailyExperience = curDaily + experience;
+            totalExperience = curExperience + experience;
         }
-        //3.如果experience + daily <= Max
-        userInfo.setDailyExperience(daily + experience);
-        userInfo.setExperience(total + experience);
-        //4.更新UserInfo
+        //4.看totalExperience是否超过了当前等级的经验值
+        //当前角色等级对应的经验值
+        Integer roleCodeExperience = RoleLevel.getExperienceByRoleCode(roleCode);
+        if (totalExperience >= roleCodeExperience) {//升级
+            String nextRoleCode = RoleLevel.getNextRoleCode(roleCode);
+            if (!StringUtils.isNullOrEmpty(nextRoleCode)) {//插入用户角色表，用户拥有了新角色
+                AuthRole role = authRoleService.getRoleByCode(nextRoleCode);
+                UserRole userRole = new UserRole();
+                userRole.setUserId(userId);
+                userRole.setRoleId(role.getId());
+                userRoleService.addUserRole(userRole);
+            }
+        }
+        //5.更新UserInfo
+        userInfo.setDailyExperience(dailyExperience);
+        userInfo.setExperience(totalExperience);
         userInfoService.updateUserInfo(userInfo);
     }
 

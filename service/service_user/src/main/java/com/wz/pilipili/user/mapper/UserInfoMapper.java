@@ -3,6 +3,7 @@ package com.wz.pilipili.user.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.wz.pilipili.entity.user.UserInfo;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,4 +20,9 @@ public interface UserInfoMapper extends BaseMapper<UserInfo> {
      * 批量更新用户信息
      */
     void batchUpdateUserInfos(List<UserInfo> userInfoList);
+
+    /**
+     * 查询指定日期活跃的用户
+     */
+    List<UserInfo> selectYesterdayActivityUsers(Date date);
 }
