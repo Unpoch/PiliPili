@@ -27,11 +27,21 @@ public interface UserConstant {
     /**
      * 默认关注分组
      */
-    public static final String USER_FOLLOWING_GROUP_TYPE_DEFAULT = "2";
+    public static final String USER_FOLLOWING_GROUP_TYPE_SPECIAL = "0";//特别关注
 
-    public static final String USER_FOLLOWING_GROUP_TYPE_USER = "3";
+    public static final String USER_FOLLOWING_GROUP_TYPE_QUIETLY = "1";//悄悄关注
+
+    public static final String USER_FOLLOWING_GROUP_TYPE_DEFAULT = "2";//默认关注分组
+
+    public static final String USER_FOLLOWING_GROUP_TYPE_USER = "3";//用户自定义分组
 
     public static final String USER_FOLLOWING_GROUP_ALL_NAME = "全部关注";
+
+    /**
+     * 视频收藏分组类型
+     */
+    public static final String VIDEO_COLLECTION_GROUP_TYPE_DEFAULT = "0";//默认收藏分组
+    public static final String VIDEO_COLLECTION_GROUP_TYPE_USER = "1";//用户自定义分组
 
     /**
      * 经验值

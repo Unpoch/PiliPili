@@ -20,6 +20,7 @@ import com.wz.pilipili.user.service.*;
 import com.wz.pilipili.util.MD5Util;
 import com.wz.pilipili.util.RSAUtil;
 import com.wz.pilipili.util.TokenUtil;
+import com.wz.pilipili.video.client.VideoCollectionFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,11 +50,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private RefreshTokenService refreshTokenService;
 
     @Autowired
+    private UserFollowingService userFollowingService;
+
+    @Autowired
     private SearchFeignClient searchFeignClient;
+
+    @Autowired
+    private VideoCollectionFeignClient videoCollectionFeignClient;
 
     /**
      * 注册
-     * TODO: 初始化用户角色，经验
      */
     @Override
     @Transactional
@@ -90,11 +96,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userInfo.setNick(UserConstant.DEFAULT_NICK);
         userInfo.setBirth(UserConstant.DEFAULT_BIRTH);
         userInfo.setGender(UserConstant.GENDER_MALE);
+        userInfo.setDailyExperience(0);
+        userInfo.setExperience(0);
         userInfoService.save(userInfo);
         //6.添加UserInfo到ES
         searchFeignClient.addUserInfo(userInfo);
         //7.添加用户默认权限角色
         userAuthService.addUserDefaultRole(user.getId());
+        //8.初始化用户关注分组
+        userFollowingService.initUserFollowingGroup(user.getId());
+        //9.初始化用户默认收藏夹
+        videoCollectionFeignClient.addDefaultVideoCollectionGroup(user.getId());
     }
 
     /**
@@ -255,7 +267,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //4.看totalExperience是否到达了下一等级的经验值
         String nextRoleCode = RoleLevel.getNextRoleCode(roleCode);
         Integer nextRoleLevelExperience = RoleLevel.getExperienceByRoleCode(nextRoleCode);//下一等级角色对应的经验值
-        if (!StringUtils.isNullOrEmpty(nextRoleCode)){
+        if (!StringUtils.isNullOrEmpty(nextRoleCode)) {
             if (totalExperience >= nextRoleLevelExperience) {//升级
                 //插入用户角色表，用户拥有了新角色
                 AuthRole role = authRoleService.getRoleByCode(nextRoleCode);

@@ -20,4 +20,6 @@ public interface VideoCollectionGroupService extends IService<VideoCollectionGro
     void deleteCollectionGroup(Long userId, Long groupId);
 
     void updateCollectionGroup(Long userId, VideoCollectionGroup videoCollectionGroup);
+
+    void addDefaultVideoCollectionGroup(Long userId);
 }

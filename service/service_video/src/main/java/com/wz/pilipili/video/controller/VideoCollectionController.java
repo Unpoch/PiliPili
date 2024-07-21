@@ -106,13 +106,13 @@ public class VideoCollectionController {
 
 
     /**
-     *  分页查看收藏分组下所有视频（用户查看自己的）
-     *  返回VideoCollection是因为冗余了Video字段
+     * 分页查看收藏分组下所有视频（用户查看自己的）
+     * 返回VideoCollection是因为冗余了Video字段
      */
     @GetMapping("/pageGroupVideos")
     public R<PageResult<VideoCollection>> pageGroupVideos(@RequestParam Integer no,
-                                                @RequestParam Integer size,
-                                                @RequestParam Integer groupId) {
+                                                          @RequestParam Integer size,
+                                                          @RequestParam Integer groupId) {
         Long userId = UserContext.getCurUserId();
         PageResult<VideoCollection> pageResult = videoCollectionService.pageGroupVideos(no, size, groupId, userId);
         return new R<>(pageResult);
@@ -120,5 +120,13 @@ public class VideoCollectionController {
 
     //TODO: 当前用户，查看其他用户的收藏夹
     //...
+
+    /*
+     远程调用接口：初始化用户的视频收藏夹
+     */
+    @PostMapping("/inner/addDefaultVideoCollectionGroup")
+    public void addDefaultVideoCollectionGroup(@RequestParam Long userId) {
+        videoCollectionService.addDefaultVideoCollectionGroup(userId);
+    }
 }
 

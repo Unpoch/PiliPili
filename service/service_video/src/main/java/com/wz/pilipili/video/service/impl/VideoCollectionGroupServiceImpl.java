@@ -1,6 +1,7 @@
 package com.wz.pilipili.video.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.wz.pilipili.constant.UserConstant;
 import com.wz.pilipili.entity.page.PageResult;
 import com.wz.pilipili.entity.video.Video;
 import com.wz.pilipili.entity.video.VideoCollectionGroup;
@@ -67,6 +68,18 @@ public class VideoCollectionGroupServiceImpl extends ServiceImpl<VideoCollection
         //2.更新
         videoCollectionGroup.setUserId(userId);//可以不需要
         baseMapper.updateById(videoCollectionGroup);
+    }
+
+    /**
+     * 初始化用户默认收藏夹
+     */
+    @Override
+    public void addDefaultVideoCollectionGroup(Long userId) {
+        VideoCollectionGroup videoCollectionGroup = new VideoCollectionGroup();
+        videoCollectionGroup.setUserId(userId);
+        videoCollectionGroup.setType(UserConstant.VIDEO_COLLECTION_GROUP_TYPE_DEFAULT);
+        videoCollectionGroup.setName("默认收藏夹");
+        baseMapper.insert(videoCollectionGroup);
     }
 
 

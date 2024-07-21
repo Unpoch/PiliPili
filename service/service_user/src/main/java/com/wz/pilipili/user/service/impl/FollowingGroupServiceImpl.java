@@ -1,7 +1,9 @@
 package com.wz.pilipili.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.wz.pilipili.constant.UserConstant;
 import com.wz.pilipili.entity.user.FollowingGroup;
+import com.wz.pilipili.enums.FollowingGroupEnum;
 import com.wz.pilipili.user.mapper.FollowingGroupMapper;
 import com.wz.pilipili.user.service.FollowingGroupService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -51,5 +53,21 @@ public class FollowingGroupServiceImpl extends ServiceImpl<FollowingGroupMapper,
         baseMapper.delete(new LambdaQueryWrapper<FollowingGroup>()
                 .eq(FollowingGroup::getUserId, userId)
                 .eq(FollowingGroup::getId, groupId));
+    }
+
+    /**
+     * 初始化用户关注分组：特别关注，悄悄关注，默认分组
+     */
+    @Override
+    public void initUserFollowingGroup(Long userId) {
+        //这里只会返回 特别关注，悄悄关注，默认分组这三种
+        List<FollowingGroupEnum> initFollowingGroupEnums = FollowingGroupEnum.getInitFollowingGroupEnums();
+        for (FollowingGroupEnum followingGroupEnum : initFollowingGroupEnums) {
+            FollowingGroup group = new FollowingGroup();
+            group.setUserId(userId);
+            group.setName(followingGroupEnum.getName());
+            group.setType(followingGroupEnum.getType());
+            baseMapper.insert(group);
+        }
     }
 }

@@ -22,4 +22,6 @@ public interface FollowingGroupService extends IService<FollowingGroup> {
     void addFollowingGroup(FollowingGroup followingGroup);
 
     void removeFollowingGroup(Long userId, Long groupId);
+
+    void initUserFollowingGroup(Long userId);
 }

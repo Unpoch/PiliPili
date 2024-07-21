@@ -162,6 +162,14 @@ public class VideoCollectionServiceImpl extends ServiceImpl<VideoCollectionMappe
     }
 
     /**
+     * 初始化用户默认收藏夹
+     */
+    @Override
+    public void addDefaultVideoCollectionGroup(Long userId) {
+        videoCollectionGroupService.addDefaultVideoCollectionGroup(userId);
+    }
+
+    /**
      * 分页获取收藏夹的所有视频信息
      */
     @Override

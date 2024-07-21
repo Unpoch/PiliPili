@@ -41,4 +41,6 @@ public interface UserFollowingService extends IService<UserFollowing> {
     Integer getFollowingCountByUserId(Long userId);
 
     Integer getFanCountByUserId(Long userId);
+
+    void initUserFollowingGroup(Long userId);
 }

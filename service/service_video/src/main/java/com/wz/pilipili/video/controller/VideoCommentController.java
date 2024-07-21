@@ -1,6 +1,8 @@
 package com.wz.pilipili.video.controller;
 
 
+import com.wz.pilipili.annotation.ApiLimitedRole;
+import com.wz.pilipili.constant.AuthRoleConstant;
 import com.wz.pilipili.context.UserContext;
 import com.wz.pilipili.entity.page.PageResult;
 import com.wz.pilipili.entity.video.VideoComment;
@@ -27,6 +29,7 @@ public class VideoCommentController {
     /**
      * 添加视频评论
      */
+    @ApiLimitedRole(limitedRoleCodeList = {AuthRoleConstant.ROLE_LV0, AuthRoleConstant.ROLE_LV1})
     @PostMapping("/addVideoComment")
     public R<String> addVideoComment(@RequestBody VideoComment videoComment) {
         Long userId = UserContext.getCurUserId();

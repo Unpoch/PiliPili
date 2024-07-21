@@ -315,6 +315,14 @@ public class UserFollowingServiceImpl extends ServiceImpl<UserFollowingMapper, U
     }
 
     /**
+     * 初始化用户关注分组
+     */
+    @Override
+    public void initUserFollowingGroup(Long userId) {
+        followingGroupService.initUserFollowingGroup(userId);
+    }
+
+    /**
      * 根据用户id获取其所有粉丝
      */
     private List<UserFollowing> getUserFans(Long userId) {

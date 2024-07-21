@@ -33,4 +33,6 @@ public interface VideoCollectionService extends IService<VideoCollection> {
     PageResult<VideoCollection> pageGroupVideos(Integer no, Integer size, Integer groupId, Long userId);
 
     void updateCollectionGroup(Long userId, VideoCollectionGroup videoCollectionGroup);
+
+    void addDefaultVideoCollectionGroup(Long userId);
 }
