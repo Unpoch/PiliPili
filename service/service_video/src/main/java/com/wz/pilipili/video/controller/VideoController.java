@@ -147,10 +147,30 @@ public class VideoController {
      */
     @GetMapping("/area/pageListAreaVideo")
     public R<PageResult<Video>> pageListAreaVideo(@RequestParam Integer pageNo,
-                                                   @RequestParam Integer pageSize,
-                                                   @RequestParam String area) {
+                                                  @RequestParam Integer pageSize,
+                                                  @RequestParam String area) {
         PageResult<Video> pageResult = videoService.pageListAreaVideo(pageNo, pageSize, area);
         return new R<>(pageResult);
+    }
+
+    /**
+     * 视频分享
+     */
+    @PostMapping("/share/shareVideo")
+    public R<String> shareVideo(@RequestParam Long videoId) {
+        Long userId = UserContext.getCurUserId();
+        String shareUrl = videoService.shareVideo(userId, videoId);
+        return new R<>(shareUrl);
+    }
+
+    /**
+     * 查询视频分享数
+     */
+    @GetMapping("/share/getVideoShareCount")
+    public R<Map<String, Object>> getVideoShareCount(@RequestParam Long videoId) {
+        Long userId = UserContext.getCurUserId();
+        Map<String, Object> result = videoService.getVideoShareCount(userId, videoId);
+        return new R<>(result);
     }
 
     /*
@@ -190,10 +210,10 @@ public class VideoController {
      */
     @GetMapping("/inner/pageListVideoLikeHistory")
     public PageResult<UserVideoHistory> pageListVideoLikeHistory(@RequestParam Integer pageNo,
-                                                      @RequestParam Integer pageSize,
-                                                      @RequestParam Long userId,
-                                                      String startTime,
-                                                      String endTime) {
+                                                                 @RequestParam Integer pageSize,
+                                                                 @RequestParam Long userId,
+                                                                 String startTime,
+                                                                 String endTime) {
         return videoService.pageListVideoLikeHistory(pageNo, pageSize, userId, startTime, endTime);
     }
 
@@ -203,10 +223,10 @@ public class VideoController {
      */
     @GetMapping("/inner/pageListVideoCoinHistory")
     public PageResult<UserVideoHistory> pageListVideoCoinHistory(@RequestParam Integer pageNo,
-                                                      @RequestParam Integer pageSize,
-                                                      @RequestParam Long userId,
-                                                      String startTime,
-                                                      String endTime) {
+                                                                 @RequestParam Integer pageSize,
+                                                                 @RequestParam Long userId,
+                                                                 String startTime,
+                                                                 String endTime) {
         return videoService.pageListVideoCoinHistory(pageNo, pageSize, userId, startTime, endTime);
     }
 }

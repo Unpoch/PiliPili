@@ -55,6 +55,9 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
     private VideoLikeService videoLikeService;
 
     @Autowired
+    private VideoShareService videoShareService;
+
+    @Autowired
     private DanmuService danmuService;
 
     @Autowired
@@ -267,7 +270,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
         userCoinFeignClient.updateUserCoin(upUserId, (upCoinAmount + postCoins));
         //5. 增加投币用户的经验值(10经验/个)，增加被投币用户的经验值(1经验值/1个)
         userInfoFeignClient.increaseExperience(userId, UserConstant.TEN_EXPERIENCE * postCoins);
-        userInfoFeignClient.increaseExperience(upUserId,UserConstant.ONE_EXPERIENCE * postCoins);
+        userInfoFeignClient.increaseExperience(upUserId, UserConstant.ONE_EXPERIENCE * postCoins);
     }
 
     /**
@@ -460,6 +463,41 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
     @Override
     public List<Area> getAllAreas() {
         return areaService.getAllAreas();
+    }
+
+    /**
+     * 视频分享
+     * TODO:链接应该采用短链 而不是长链接
+     */
+    @Override
+    public String shareVideo(Long userId, Long videoId) {
+        //1.查询视频信息
+        Video video = this.getVideoByVideoId(videoId);
+        String title = video.getTitle();//视频标题
+        String url = video.getUrl();
+        //2.插入视频分享表
+        VideoShare videoShare = new VideoShare();
+        videoShare.setUserId(userId);
+        videoShare.setVideoId(videoId);
+        videoShareService.addVideoShare(videoShare);
+        //3.将生成链接返回
+        return "【" + title + "】" + url;
+    }
+
+    /**
+     * 查询视频分享数
+     */
+    @Override
+    public Map<String, Object> getVideoShareCount(Long userId, Long videoId) {
+        //获取视频点赞数
+        Integer count = videoShareService.getVideoShareCount(videoId);
+        //看userId是否已经分享过
+        VideoShare videoShare = videoShareService.getVideoShareByVideoIdAndUserId(userId, videoId);
+        boolean share = videoShare == null;
+        Map<String, Object> result = new HashMap<>();
+        result.put("count", count);
+        result.put("share", share);
+        return result;
     }
 
     private void setTagListForVideoList(List<Video> videoList) {

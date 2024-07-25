@@ -56,4 +56,8 @@ public interface VideoService extends IService<Video> {
     PageResult<Video> pageListAreaVideo(Integer pageNo, Integer pageSize, String area);
 
     List<Area> getAllAreas();
+
+    String shareVideo(Long userId, Long videoId);
+
+    Map<String, Object> getVideoShareCount(Long userId, Long videoId);
 }
