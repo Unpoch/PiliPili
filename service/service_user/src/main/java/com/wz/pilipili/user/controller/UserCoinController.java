@@ -1,7 +1,9 @@
 package com.wz.pilipili.user.controller;
 
 
+import com.wz.pilipili.context.UserContext;
 import com.wz.pilipili.entity.user.UserCoin;
+import com.wz.pilipili.result.R;
 import com.wz.pilipili.user.service.UserCoinService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +23,16 @@ public class UserCoinController {
     @Autowired
     private UserCoinService userCoinService;
 
-    /**
-     * TODO : 用户硬币获取行为
-     */
 
     /**
-     * 、
-     * TODO ：查询用户硬币数量
+     * 查询用户硬币数量
      */
+    @GetMapping("/getUserCoins")
+    public R<Integer> getUserCoins() {
+        Long userId = UserContext.getCurUserId();
+        Integer count = userCoinService.getUserCoins(userId);
+        return new R<>(count);
+    }
 
 
     /*
