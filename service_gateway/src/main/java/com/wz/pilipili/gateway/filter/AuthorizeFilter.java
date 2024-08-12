@@ -1,8 +1,10 @@
 package com.wz.pilipili.gateway.filter;
 
 import com.wz.pilipili.exception.ConditionException;
+import com.wz.pilipili.gateway.config.WhiteListConfig;
 import com.wz.pilipili.util.TokenUtil;
 import io.netty.util.internal.StringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -20,6 +22,9 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthorizeFilter implements Ordered, GlobalFilter {
 
+    @Autowired
+    private WhiteListConfig whiteList;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         //1.获取request和response对象
@@ -27,7 +32,7 @@ public class AuthorizeFilter implements Ordered, GlobalFilter {
         ServerHttpResponse response = exchange.getResponse();
         //2.判断是否是登录 / 登录-双令牌 / 刷新令牌
         String path = request.getURI().getPath();
-        if (path.contains("/rsa-pks") || path.contains("/register") || path.contains("/login")|| path.contains("/login-dts") || path.contains("/access-token")) {
+        if (whiteList.isWhiteListed(path)) {
             return chain.filter(exchange);//放行
         }
         //3.获取token
